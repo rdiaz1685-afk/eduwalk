@@ -194,11 +194,13 @@ const StrategicDashboard = ({ userProfile }) => {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center p-12 bg-white rounded-2xl border border-slate-100 min-h-[400px]">
-            <div className="text-center">
-                <RefreshCw className="animate-spin text-primary mx-auto mb-4" size={40} />
-                <p className="text-slate-600 font-medium">Generando análisis estratégico...</p>
-                <p className="text-slate-400 text-sm mt-1">Esto puede tomar unos segundos.</p>
+        <div className="strategic-dashboard">
+            <div className="flex items-center justify-center p-12 bg-white rounded-2xl border border-slate-100 min-h-[400px]">
+                <div className="text-center">
+                    <RefreshCw className="animate-spin text-primary mx-auto mb-4" size={40} />
+                    <p className="text-slate-700 font-medium">Generando análisis estratégico...</p>
+                    <p className="text-slate-500 text-sm mt-1">Esto puede tomar unos segundos.</p>
+                </div>
             </div>
         </div>
     );
@@ -399,21 +401,21 @@ const StrategicDashboard = ({ userProfile }) => {
                 </div>
 
                 {/* Strategic Summary */}
-                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-2xl shadow-lg text-white">
+                <div className="bg-gradient-to-br from-primary to-primary-dark p-6 rounded-2xl shadow-lg text-white">
                     <h3 className="font-bold mb-4 flex items-center gap-2">
                         <Activity size={20} />
                         Análisis Institucional
                     </h3>
                     <div className="space-y-4">
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
-                            <p className="text-xs text-indigo-100 uppercase font-bold tracking-wider mb-1">Indicador de Éxito</p>
+                            <p className="text-xs text-white/60 uppercase font-bold tracking-wider mb-1">Indicador de Éxito</p>
                             <h4 className="text-lg font-bold">Ambiente en el Aula</h4>
-                            <p className="text-sm text-indigo-100/80">Se observa un clima de respeto y colaboración consistente.</p>
+                            <p className="text-sm text-white/80">Se observa un clima de respeto y colaboración consistente.</p>
                         </div>
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
-                            <p className="text-xs text-indigo-100 uppercase font-bold tracking-wider mb-1">Área de Mejora</p>
+                            <p className="text-xs text-white/60 uppercase font-bold tracking-wider mb-1">Área de Mejora</p>
                             <h4 className="text-lg font-bold">Planeación y Preparación</h4>
-                            <p className="text-sm text-indigo-100/80">Oportunidad detectada en la alineación de evaluaciones.</p>
+                            <p className="text-sm text-white/80">Oportunidad detectada en la alineación de evaluaciones.</p>
                         </div>
                     </div>
                 </div>

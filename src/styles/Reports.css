@@ -60,7 +60,7 @@
 .search-box input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
 .table-responsive {
@@ -178,7 +178,7 @@
 /* AI Button Styling */
 .btn-icon[title*="Análisis"] {
     color: var(--primary);
-    background: rgba(79, 70, 229, 0.1);
+    background: var(--primary-glow);
 }
 
 .btn-icon[title*="Análisis"]:hover {
@@ -193,15 +193,15 @@
         max-height: 98vh;
         margin: 1vh;
     }
-    
+
     .ai-modal .modal-header {
         padding: 1rem;
     }
-    
+
     .ai-modal .modal-header h2 {
         font-size: 1rem;
     }
-    
+
     .ai-modal-body {
         max-height: calc(98vh - 80px);
     }
