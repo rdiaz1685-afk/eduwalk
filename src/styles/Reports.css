@@ -1,0 +1,208 @@
+.reports-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-outline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--text-main);
+    transition: var(--transition-fast);
+}
+
+.btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.reports-controls {
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.table-responsive {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+}
+
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.reports-table th,
+.reports-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--bg-main);
+}
+
+.reports-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    background-color: #F9FAFB;
+}
+
+.reports-table td {
+    font-size: 0.875rem;
+    color: var(--text-main);
+}
+
+.fw-medium {
+    font-weight: 500;
+}
+
+.score-badge {
+    background: #EEF2FF;
+    color: var(--primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+.status-pill {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.status-pill.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.status-pill.needs-review {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.btn-icon {
+    padding: 0.5rem;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--bg-main);
+    color: var(--primary);
+}
+
+/* AI Analysis Modal Styles */
+.ai-modal {
+    max-width: 95vw;
+    width: 1200px;
+    max-height: 95vh;
+    overflow-y: auto;
+}
+
+.ai-modal .modal-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-modal .modal-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.ai-modal .modal-header .btn-icon {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.ai-modal .modal-header .btn-icon:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.ai-modal-body {
+    padding: 0;
+    max-height: calc(95vh - 100px);
+    overflow-y: auto;
+}
+
+/* AI Button Styling */
+.btn-icon[title*="Análisis"] {
+    color: var(--primary);
+    background: rgba(79, 70, 229, 0.1);
+}
+
+.btn-icon[title*="Análisis"]:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Responsive Design for AI Modal */
+@media (max-width: 768px) {
+    .ai-modal {
+        width: 95vw;
+        max-height: 98vh;
+        margin: 1vh;
+    }
+    
+    .ai-modal .modal-header {
+        padding: 1rem;
+    }
+    
+    .ai-modal .modal-header h2 {
+        font-size: 1rem;
+    }
+    
+    .ai-modal-body {
+        max-height: calc(98vh - 80px);
+    }
+}

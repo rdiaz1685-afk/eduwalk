@@ -1,0 +1,44 @@
+:root {
+  /* Brand Colors - Premium Education Tech */
+  --primary: #4F46E5; /* Indigo 600 */
+  --primary-light: #818CF8;
+  --primary-dark: #3730A3;
+  
+  --secondary: #0EA5E9; /* Sky 500 */
+  --accent: #F472B6; /* Pink 400 - for highlights */
+  
+  /* Backgrounds */
+  --bg-main: #F3F4F6; /* Gray 100 */
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #111827; /* Gray 900 */
+  
+  /* Text */
+  --text-main: #1F2937; /* Gray 800 */
+  --text-muted: #6B7280; /* Gray 500 */
+  --text-light: #F9FAFB; /* Gray 50 */
+  
+  /* Status */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  
+  /* Spacing & Layout */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --bg-main: #0F172A; /* Slate 900 */
+  --bg-card: #1E293B; /* Slate 800 */
+  --text-main: #F1F5F9; /* Slate 100 */
+  --text-muted: #94A3B8; /* Slate 400 */
+}
