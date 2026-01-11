@@ -1,46 +1,49 @@
 :root {
-  /* Neon Palette - Cyberpunk Green (Toxic/Matrix Style) */
-  --primary: #4ade80;
-  /* Toxic Green */
-  --primary-glow: rgba(74, 222, 128, 0.5);
-  --primary-dark: #16a34a;
+  /* Neon Palette - Fire & Amber (Magma Style) */
+  --primary: #f97316;
+  /* Bright Orange */
+  --primary-glow: rgba(249, 115, 22, 0.5);
+  --primary-dark: #c2410c;
 
-  --secondary: #a855f7;
-  /* Electric Purple */
-  --secondary-glow: rgba(168, 85, 247, 0.4);
+  --secondary: #fbbf24;
+  /* Amber/Yellow Glow */
+  --secondary-glow: rgba(251, 191, 36, 0.4);
 
-  --accent: #facc15;
-  /* Caution Yellow */
-  --accent-glow: rgba(250, 204, 21, 0.4);
+  --accent: #ef4444;
+  /* Flame Red */
+  --accent-glow: rgba(239, 68, 68, 0.4);
 
-  /* Backgrounds - Obsidian & Deep Green */
-  --bg-main: #020617;
-  --bg-card: rgba(15, 23, 42, 0.85);
+  /* Backgrounds - Deep Coal & Ember */
+  --bg-main: #0c0a09;
+  /* Stone 950 - Warm Black */
+  --bg-card: rgba(28, 25, 23, 0.85);
+  /* Warm Slate */
   --bg-sidebar: #010409;
 
   /* Glassmorphism Effect */
-  --glass-bg: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(74, 222, 128, 0.2);
+  --glass-bg: rgba(28, 25, 23, 0.7);
+  --glass-border: rgba(249, 115, 22, 0.2);
 
   /* Text */
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
+  --text-main: #fafaf9;
+  --text-muted: #a8a29e;
   --text-light: #ffffff;
 
   /* Status */
-  --success: #4ade80;
-  --warning: #facc15;
-  --error: #f43f5e;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
 
   /* Spacing & Borders */
-  --radius-sm: 4px;
-  --radius-md: 10px;
-  --radius-lg: 20px;
+  --radius-sm: 8px;
+  /* Slightly softer for fire theme */
+  --radius-md: 14px;
+  --radius-lg: 28px;
 
   /* Glass & Neon Shadows */
   --shadow-neon: 0 0 15px var(--primary-glow);
-  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-  --shadow-inner-glow: inset 0 0 10px rgba(74, 222, 128, 0.05);
+  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.9);
+  --shadow-inner-glow: inset 0 0 10px rgba(249, 115, 22, 0.05);
 
   --transition-fast: 150ms ease;
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -48,7 +51,7 @@
 
 /* Base Body Styles */
 body {
-  background: radial-gradient(circle at top right, #064e4b, #020617);
+  background: radial-gradient(circle at top right, #44220b, #0c0a09);
   background-attachment: fixed;
   color: var(--text-main);
 }
