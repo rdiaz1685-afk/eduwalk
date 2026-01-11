@@ -15,6 +15,7 @@ const TeacherManagement = () => {
     const [currentUserSchoolId, setCurrentUserSchoolId] = useState(null);
     const [isBulkOpen, setIsBulkOpen] = useState(false);
     const [assignmentFilter, setAssignmentFilter] = useState('all'); // all, assigned, unassigned
+    const [campusFilter, setCampusFilter] = useState('all');
     const [newTeacher, setNewTeacher] = useState({
         full_name: '',
         email: '',
@@ -191,11 +192,13 @@ const TeacherManagement = () => {
         if (assignmentFilter === 'assigned') matchesAssignment = !!t.coordinator_id;
         if (assignmentFilter === 'unassigned') matchesAssignment = !t.coordinator_id;
 
+        const matchesCampus = campusFilter === 'all' || t.school_id === campusFilter;
+
         const matchesRole = ['director', 'principal', 'coordinator'].includes(currentUserRole)
             ? t.school_id === currentUserSchoolId
             : true;
 
-        return matchesSearch && matchesAssignment && matchesRole;
+        return matchesSearch && matchesAssignment && matchesCampus && matchesRole;
     });
 
     const canAssignCoordinators = ['admin', 'director', 'principal', 'rector', 'supervisor'].includes(currentUserRole);
@@ -239,17 +242,32 @@ const TeacherManagement = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
 
-                    {['admin', 'director', 'principal', 'rector'].includes(currentUserRole) && (
-                        <select
-                            className="premium-input"
-                            value={assignmentFilter}
-                            onChange={(e) => setAssignmentFilter(e.target.value)}
-                            style={{ width: '200px' }}
-                        >
-                            <option value="all">Todos los Maestros</option>
-                            <option value="assigned">Asignados</option>
-                            <option value="unassigned">Sin Asignar</option>
-                        </select>
+                    {['admin', 'director', 'principal', 'rector', 'supervisor'].includes(currentUserRole) && (
+                        <div className="flex gap-2">
+                            {['admin', 'rector', 'supervisor'].includes(currentUserRole) && (
+                                <select
+                                    className="premium-input"
+                                    value={campusFilter}
+                                    onChange={(e) => setCampusFilter(e.target.value)}
+                                    style={{ width: '200px' }}
+                                >
+                                    <option value="all">Todos los Campus</option>
+                                    {schools.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                            )}
+                            <select
+                                className="premium-input"
+                                value={assignmentFilter}
+                                onChange={(e) => setAssignmentFilter(e.target.value)}
+                                style={{ width: '200px' }}
+                            >
+                                <option value="all">Todos los Maestros</option>
+                                <option value="assigned">Asignados</option>
+                                <option value="unassigned">Sin Asignar</option>
+                            </select>
+                        </div>
                     )}
                 </div>
             </div>
