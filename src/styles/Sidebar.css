@@ -8,11 +8,24 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 50;
+    z-index: 100;
+    /* Increased for mobile */
     transition: transform var(--transition-normal);
     border-right: 1px solid var(--glass-border);
     backdrop-filter: blur(20px);
 }
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 90;
+}
+
 
 .sidebar-header {
     padding: 2rem 1.5rem;

@@ -13,7 +13,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import '../../styles/Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const [role, setRole] = React.useState(null);
     const navigate = useNavigate();
 
@@ -47,37 +47,46 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="sidebar">
-            <div className="sidebar-header">
-                <div className="logo-container">
-                    <GraduationCap size={32} color="var(--primary-light)" />
-                    <h1>EduWalk</h1>
+        <>
+            {/* Overlay for mobile */}
+            {isOpen && <div className="sidebar-overlay" onClick={onClose}></div>}
+
+            <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+                <div className="sidebar-header">
+                    <div className="logo-container">
+                        <GraduationCap size={40} className="logo-icon" />
+                        <h1>EduWalk</h1>
+                    </div>
                 </div>
-            </div>
 
-            <nav className="sidebar-nav">
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            `nav-item ${isActive ? 'active' : ''}`
-                        }
-                    >
-                        {item.icon}
-                        <span>{item.label}</span>
-                    </NavLink>
-                ))}
-            </nav>
+                <nav className="sidebar-nav">
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => {
+                                if (window.innerWidth <= 768) onClose();
+                            }}
+                            className={({ isActive }) =>
+                                `nav-item ${isActive ? 'active' : ''}`
+                            }
+                        >
+                            {item.icon}
+                            <span>{item.label}</span>
+                        </NavLink>
+                    ))}
+                </nav>
 
-            <div className="sidebar-footer">
-                <button className="logout-btn" onClick={handleSignOut}>
-                    <LogOut size={20} />
-                    <span>Sign Out</span>
-                </button>
-            </div>
-        </aside>
+                <div className="sidebar-footer">
+                    <button className="logout-btn" onClick={handleSignOut}>
+                        <LogOut size={20} />
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </aside>
+        </>
     );
 };
+
 
 export default Sidebar;
