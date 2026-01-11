@@ -12,6 +12,7 @@ body {
   color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
 button {
@@ -28,44 +29,61 @@ a {
 
 /* Utilities */
 .container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
 
 .card {
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   padding: 1.5rem;
+  transition: var(--transition-normal);
+}
+
+.card:hover {
+  border-color: rgba(14, 165, 233, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 15px rgba(14, 165, 233, 0.1);
+  transform: translateY(-2px);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  letter-spacing: 0.025em;
   transition: var(--transition-fast);
+  text-transform: uppercase;
+  font-size: 0.75rem;
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
+  box-shadow: 0 0 20px var(--primary-glow);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background-color: var(--text-muted);
-  color: white;
+  background-color: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
 }
 
 .btn-secondary:hover {
-  background-color: var(--text-main);
+  background-color: var(--glass-bg);
+  border-color: var(--text-muted);
 }
 
 .btn-icon {
@@ -75,20 +93,24 @@ a {
   padding: 0.5rem;
   border-radius: var(--radius-sm);
   transition: var(--transition-fast);
+  color: var(--text-muted);
 }
 
 .btn-icon:hover {
-  background-color: var(--bg-main);
+  background-color: var(--glass-bg);
+  color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
-/* Modal Styles */
+/* Modal Styles - Futuristic Glass */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,8 +119,9 @@ a {
 
 .modal-content {
   background: var(--bg-card);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
@@ -110,13 +133,17 @@ a {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid var(--bg-main);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .modal-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
+  background: linear-gradient(to right, #fff, var(--primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .modal-body {
@@ -128,26 +155,29 @@ a {
   gap: 1rem;
   justify-content: flex-end;
   padding: 1.5rem;
-  border-top: 1px solid var(--bg-main);
+  border-top: 1px solid var(--glass-border);
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
 }
 
 .premium-input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.2);
   color: var(--text-main);
   font-size: 0.875rem;
   transition: var(--transition-fast);
@@ -156,5 +186,6 @@ a {
 .premium-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 15px var(--primary-glow);
+  background: rgba(0, 0, 0, 0.4);
 }
