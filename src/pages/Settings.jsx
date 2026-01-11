@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import ChangePasswordForm from '../components/Settings/ChangePasswordForm';
 import {
     Settings as SettingsIcon,
@@ -18,10 +19,36 @@ import '../styles/Settings.css';
 
 const Settings = () => {
     const { user } = useAuth();
+    const [localProfile, setLocalProfile] = useState(null);
+    const [loadingProfile, setLoadingProfile] = useState(true);
     const [integrations, setIntegrations] = useState({
         oneroster: { connected: true, lastSync: '10 mins ago', status: 'Healthy' },
         google: { connected: false, lastSync: '-', status: 'Disconnected' }
     });
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (user?.id) {
+                try {
+                    const { data, error } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (data) setLocalProfile(data);
+                } catch (error) {
+                    console.error('Error fetching local profile:', error);
+                } finally {
+                    setLoadingProfile(false);
+                }
+            } else {
+                setLoadingProfile(false);
+            }
+        };
+
+        fetchProfile();
+    }, [user?.id]);
 
     const toggleIntegration = (key) => {
         setIntegrations(prev => ({
@@ -73,14 +100,48 @@ const Settings = () => {
                                 <User size={18} />
                                 <div>
                                     <label>Nombre</label>
-                                    <p>{user?.user_metadata?.full_name || 'No especificado'}</p>
+                                    <p>
+                                        {loadingProfile ? (
+                                            <span style={{ opacity: 0.5 }}>Cargando...</span>
+                                        ) : (
+                                            localProfile?.full_name ||
+                                            user?.profile?.full_name ||
+                                            user?.user_metadata?.full_name ||
+                                            user?.user_metadata?.name ||
+                                            user?.user_metadata?.fullName ||
+                                            user?.user_metadata?.display_name ||
+                                            user?.email?.split('@')[0] ||
+                                            'No especificado'
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                             <div className="info-item">
                                 <Shield size={18} />
                                 <div>
                                     <label>Rol</label>
-                                    <p>{user?.user_metadata?.role || 'No especificado'}</p>
+                                    <p>
+                                        {loadingProfile ? (
+                                            <span style={{ opacity: 0.5 }}>Cargando...</span>
+                                        ) : (
+                                            (() => {
+                                                const role = localProfile?.role ||
+                                                    user?.profile?.role ||
+                                                    user?.user_metadata?.role ||
+                                                    user?.user_metadata?.user_role ||
+                                                    user?.role;
+
+                                                const mapping = {
+                                                    'coordinator': 'Coordinador',
+                                                    'supervisor': 'Supervisor',
+                                                    'director': 'Director de Campus',
+                                                    'rector': 'Rector',
+                                                    'admin': 'Administrador'
+                                                };
+                                                return mapping[role?.toLowerCase()] || role || 'No especificado';
+                                            })()
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                         </div>
