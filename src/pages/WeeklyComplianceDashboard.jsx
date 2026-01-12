@@ -394,6 +394,28 @@ const WeeklyComplianceDashboard = () => {
         updateRemainingDays();
     };
 
+    const handleFixPermissions = async () => {
+        try {
+            const sql = `
+                DROP POLICY IF EXISTS "Enable read access for all users" ON observations;
+                CREATE POLICY "Enable read access for all users" ON observations FOR SELECT USING (true);
+                
+                DROP POLICY IF EXISTS "Enable read access for all users" ON teachers;
+                CREATE POLICY "Enable read access for all users" ON teachers FOR SELECT USING (true);
+            `;
+            const { error } = await supabase.rpc('execute_sql', { sql_query: sql });
+            if (error) {
+                console.error('Error fixing permissions:', error);
+                alert('Error al reparar permisos: ' + error.message);
+            } else {
+                alert('Permisos reparados exitosamente. Ahora intenta Actualizar.');
+                handleRefresh();
+            }
+        } catch (err) {
+            alert('Error inesperado: ' + err.message);
+        }
+    };
+
     const currentDateRange = viewType === 'weekly'
         ? WeekService.getWeekDateRange(currentWeek)
         : WeekService.getFortnightDateRange(currentFortnight);
@@ -450,68 +472,71 @@ const WeeklyComplianceDashboard = () => {
                             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                             Actualizar
                         </button>
+                        <button onClick={handleFixPermissions} className="btn btn-primary" style={{ backgroundColor: '#f59e0b', borderColor: '#f59e0b' }}>
+                            Reparar Permisos
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                {/* Remaining Days Alert */}
-                {remainingDays && (
-                    <div className={`remaining-days-alert ${getUrgencyColor(remainingDays.urgencyLevel)}`}>
-                        <div className="alert-content">
-                            <div className="alert-icon">
-                                {getUrgencyIcon(remainingDays.urgencyLevel)}
-                            </div>
-                            <div className="alert-text">
-                                <h4>
-                                    {remainingDays.isWeekend ? 'Fin de Semana' :
-                                        remainingDays.todayIsWorkDay ? 'Hoy es día de observación' :
-                                            'Día no laborable'}
-                                </h4>
-                                <p>
-                                    {remainingDays.periodLabel}: {remainingDays.remainingDays} de {remainingDays.totalWorkDays} días restantes para observaciones
-                                    {remainingDays.remainingDays > 0 && (
-                                        <span> (Próximo: {remainingDays.remainingDates[0]?.toLocaleDateString()})</span>
-                                    )}
-                                </p>
-                            </div>
+            {/* Remaining Days Alert */}
+            {remainingDays && (
+                <div className={`remaining-days-alert ${getUrgencyColor(remainingDays.urgencyLevel)}`}>
+                    <div className="alert-content">
+                        <div className="alert-icon">
+                            {getUrgencyIcon(remainingDays.urgencyLevel)}
+                        </div>
+                        <div className="alert-text">
+                            <h4>
+                                {remainingDays.isWeekend ? 'Fin de Semana' :
+                                    remainingDays.todayIsWorkDay ? 'Hoy es día de observación' :
+                                        'Día no laborable'}
+                            </h4>
+                            <p>
+                                {remainingDays.periodLabel}: {remainingDays.remainingDays} de {remainingDays.totalWorkDays} días restantes para observaciones
+                                {remainingDays.remainingDays > 0 && (
+                                    <span> (Próximo: {remainingDays.remainingDates[0]?.toLocaleDateString()})</span>
+                                )}
+                            </p>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {/* Period Navigation */}
-                <div className="period-navigation">
-                    <div className="period-selector">
-                        <button
-                            onClick={handlePreviousPeriod}
-                            className="nav-btn"
-                            disabled={currentWeek <= 1 && currentFortnight <= 1}
-                        >
-                            ←
-                        </button>
-                        <div className="period-info">
-                            <span className="period-label">
-                                {viewType === 'weekly' ? `Semana ${currentWeek}` : `Quincena ${currentFortnight}`}
-                            </span>
-                            <span className="period-dates">{currentDateRange.display}</span>
-                        </div>
-                        <button onClick={handleNextPeriod} className="nav-btn">
-                            →
-                        </button>
+            {/* Period Navigation */}
+            <div className="period-navigation">
+                <div className="period-selector">
+                    <button
+                        onClick={handlePreviousPeriod}
+                        className="nav-btn"
+                        disabled={currentWeek <= 1 && currentFortnight <= 1}
+                    >
+                        ←
+                    </button>
+                    <div className="period-info">
+                        <span className="period-label">
+                            {viewType === 'weekly' ? `Semana ${currentWeek}` : `Quincena ${currentFortnight}`}
+                        </span>
+                        <span className="period-dates">{currentDateRange.display}</span>
                     </div>
+                    <button onClick={handleNextPeriod} className="nav-btn">
+                        →
+                    </button>
+                </div>
 
-                    <div className="view-toggle">
-                        <button
-                            className={`toggle-btn ${viewType === 'weekly' ? 'active' : ''}`}
-                            onClick={() => setViewType('weekly')}
-                        >
-                            Semanal
-                        </button>
-                        <button
-                            className={`toggle-btn ${viewType === 'fortnightly' ? 'active' : ''}`}
-                            onClick={() => setViewType('fortnightly')}
-                        >
-                            Quincenal
-                        </button>
-                    </div>
+                <div className="view-toggle">
+                    <button
+                        className={`toggle-btn ${viewType === 'weekly' ? 'active' : ''}`}
+                        onClick={() => setViewType('weekly')}
+                    >
+                        Semanal
+                    </button>
+                    <button
+                        className={`toggle-btn ${viewType === 'fortnightly' ? 'active' : ''}`}
+                        onClick={() => setViewType('fortnightly')}
+                    >
+                        Quincenal
+                    </button>
                 </div>
             </div>
 
@@ -698,7 +723,7 @@ const WeeklyComplianceDashboard = () => {
                     ))}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
