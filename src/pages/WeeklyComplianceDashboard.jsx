@@ -70,49 +70,60 @@ const WeeklyComplianceDashboard = () => {
         if (!profile) return;
         setLoading(true);
         try {
-            const dateRange = viewType === 'weekly'
-                ? WeekService.getWeekDateRange(currentWeek)
-                : WeekService.getFortnightDateRange(currentFortnight);
-
             // Get BOTH ranges for smart compliance calculation
             const weeklyRange = WeekService.getWeekDateRange(currentWeek);
             const fortnightlyRange = WeekService.getFortnightDateRange(currentFortnight);
 
-            // Filter for Director: only coordinators of their same school
-            let coordQuery = supabase
+            // 1. Fetch relevant coordinators
+            let profilesQuery = supabase
                 .from('profiles')
-                .select(`
-                    id,
-                    full_name,
-                    email,
-                    teachers!coordinator_id(
-                        id,
-                        full_name,
-                        school_id,
-                        tenure_status,
-                        observations(
-                            id,
-                            created_at,
-                            teacher_id
-                        )
-                    )
-                    `)
+                .select('id, full_name, email, school_id')
                 .eq('role', 'coordinator');
 
             if (profile.role === 'director' && profile.school_id) {
-                coordQuery = coordQuery.eq('school_id', profile.school_id);
+                profilesQuery = profilesQuery.eq('school_id', profile.school_id);
             } else if (profile.role === 'rector' && campusFilter !== 'all') {
-                coordQuery = coordQuery.eq('school_id', campusFilter);
+                profilesQuery = profilesQuery.eq('school_id', campusFilter);
             }
 
-            const { data: rawData, error: rawError } = await coordQuery;
+            const { data: coordinatorsData, error: profilesError } = await profilesQuery;
+            if (profilesError) throw profilesError;
 
-            if (rawError) throw rawError;
+            // 2. Fetch all teachers managed by these coordinators
+            const coordinatorIds = (coordinatorsData || []).map(c => c.id);
+            if (coordinatorIds.length === 0) {
+                setComplianceData(processComplianceData([], [], [], profile, weeklyRange, fortnightlyRange)); // empty
+                setCoordinatorData([]);
+                setLoading(false);
+                return;
+            }
 
-            // Important: If director, we must also ensure we only count teachers of THAT school 
-            // (though coordinators are usually tied to one school anyway)
-            // We pass both ranges to use smart logic
-            const processedData = processComplianceData(rawData, dateRange, profile, weeklyRange, fortnightlyRange);
+            let teachersQuery = supabase
+                .from('teachers')
+                .select('id, full_name, school_id, coordinator_id, tenure_status')
+                .in('coordinator_id', coordinatorIds);
+
+            const { data: teachersData, error: teachersError } = await teachersQuery;
+            if (teachersError) throw teachersError;
+
+            const teacherIds = (teachersData || []).map(t => t.id);
+
+            // 3. Fetch all observations for these teachers within the max range
+            // We use the start of the fortnight range to be safe (it covers week range too usually)
+            // Actually, let's just get observations from the earliest date we care about.
+            const earliestDate = fortnightlyRange.start < weeklyRange.start ? fortnightlyRange.start : weeklyRange.start;
+
+            let obsQuery = supabase
+                .from('observations')
+                .select('id, created_at, teacher_id')
+                .in('teacher_id', teacherIds)
+                .gte('created_at', earliestDate.toISOString());
+
+            const { data: obsData, error: obsError } = await obsQuery;
+            if (obsError) throw obsError;
+
+            // Process data by stitching arrays
+            const processedData = processComplianceData(coordinatorsData, teachersData, obsData, profile, weeklyRange, fortnightlyRange);
             setComplianceData(processedData);
             setCoordinatorData(processedData.coordinators);
         } catch (error) {
@@ -124,16 +135,16 @@ const WeeklyComplianceDashboard = () => {
         }
     };
 
-    const processComplianceData = (rawData, defaultDateRange, viewerProfile, weeklyRange, fortnightlyRange) => {
-        const coordinators = rawData.map(coordinator => {
-            let teachers = coordinator.teachers || [];
+    const processComplianceData = (coordinatorsList, teachersList, observationsList, viewerProfile, weeklyRange, fortnightlyRange) => {
+        const coordinators = coordinatorsList.map(coordinator => {
+            let teachers = teachersList.filter(t => t.coordinator_id === coordinator.id);
             if (viewerProfile?.role === 'director' && viewerProfile.school_id) {
                 teachers = teachers.filter(t => t.school_id === viewerProfile.school_id);
             }
             const totalTeachers = teachers.length;
 
             const teachersWithObservations = teachers.filter(teacher => {
-                const observations = teacher.observations || [];
+                const observations = observationsList.filter(o => o.teacher_id === teacher.id);
 
                 // Smart Logic: Determine applicable range based on tenure status
                 const isNew = teacher.tenure_status === 'new';
@@ -149,7 +160,7 @@ const WeeklyComplianceDashboard = () => {
             });
 
             const pendingTeachers = teachers.filter(teacher => {
-                const observations = teacher.observations || [];
+                const observations = observationsList.filter(o => o.teacher_id === teacher.id);
 
                 // Smart Logic: Determine applicable range based on tenure status
                 const isNew = teacher.tenure_status === 'new';
