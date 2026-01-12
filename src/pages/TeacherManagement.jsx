@@ -31,9 +31,88 @@ const TeacherManagement = () => {
         fetchUserRole();
     }, []);
 
-    // ... (fetchUserRole and fetchData remain same)
+    const fetchUserRole = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { data } = await supabase
+                .from('profiles')
+                .select('role, school_id')
+                .eq('id', user.id)
+                .single();
+            setCurrentUserRole(data?.role);
+            setCurrentUserSchoolId(data?.school_id);
+            setCurrentUserId(user.id);
 
-    // ... (handleAssign and handleToggleStatus remain same)
+            // If user has a specific school and is NOT admin, pre-set the school_id
+            if (data?.school_id && data?.role !== 'admin') {
+                setNewTeacher(prev => ({ ...prev, school_id: data.school_id }));
+            }
+        }
+    };
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const { data: teachersData } = await supabase
+                .from('teachers')
+                .select('*, schools(name)')
+                .order('full_name');
+
+            const { data: coordsData } = await supabase
+                .from('profiles')
+                .select('id, full_name, school_id')
+                .eq('role', 'coordinator');
+
+            const { data: schoolsData } = await supabase
+                .from('schools')
+                .select('*')
+                .order('name');
+
+            setTeachers(teachersData || []);
+            setCoordinators(coordsData || []);
+            setSchools(schoolsData || []);
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAssign = async (teacherId, coordinatorId) => {
+        console.log('Attempting to assign:', { teacherId, coordinatorId });
+        try {
+            const { error } = await supabase
+                .from('teachers')
+                .update({ coordinator_id: coordinatorId })
+                .eq('id', teacherId);
+
+            if (error) {
+                console.error('Database update error:', error);
+                throw error;
+            }
+
+            console.log('Assignment successful, refetching...');
+            fetchData();
+        } catch (err) {
+            console.error('Final catch error:', err);
+            alert('Error al asignar: ' + (err.message || 'Error desconocido'));
+        }
+    };
+
+    const handleToggleStatus = async (teacherId, currentStatus) => {
+        const nextStatus = currentStatus === 'new' ? 'tenured' : 'new';
+        try {
+            const { error } = await supabase
+                .from('teachers')
+                .update({ tenure_status: nextStatus })
+                .eq('id', teacherId);
+
+            if (error) throw error;
+            fetchData();
+        } catch (err) {
+            alert('Error al cambiar status: ' + err.message);
+        }
+    };
 
     const handleEditClick = (teacher) => {
         setSelectedTeacherId(teacher.id);
