@@ -6,6 +6,7 @@ import {
     PieChart, Pie, Cell
 } from 'recharts';
 import { WeekService } from '../../services/weekService';
+import { formatAppName } from '../../utils/formatters';
 
 const AdminDashboard = ({ userProfile }) => {
     const [coordinators, setCoordinators] = useState([]);
@@ -86,7 +87,7 @@ const AdminDashboard = ({ userProfile }) => {
 
                 return {
                     id: coord.id,
-                    name: coord.full_name,
+                    name: formatAppName(coord.full_name),
                     teachersCount: coordTeachers.length,
                     onTrack,
                     compliance: compliancePercent

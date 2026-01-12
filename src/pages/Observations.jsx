@@ -11,6 +11,7 @@ import {
 import { templates, danielsonFramework } from '../data/templates';
 import { generateObservationPDF } from '../services/pdfService';
 import { supabase } from '../lib/supabase';
+import { formatAppName } from '../utils/formatters';
 import '../styles/Observations.css';
 
 const Observations = () => {
@@ -301,7 +302,7 @@ const Observations = () => {
                                     >
                                         <option value="">Select Teacher...</option>
                                         {teachers.map(t => (
-                                            <option key={t.id} value={t.id}>{t.full_name}</option>
+                                            <option key={t.id} value={t.id}>{formatAppName(t.full_name)}</option>
                                         ))}
                                     </select>
                                     <button

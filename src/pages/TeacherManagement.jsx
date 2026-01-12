@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserPlus, Search, Pencil, CircleCheck, UserCheck, CircleAlert, X, Upload, Trash2, Power, MoreVertical } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import BulkTeacherUploadModal from '../components/Teacher/BulkTeacherUploadModal';
+import { formatAppName } from '../utils/formatters';
 
 const TeacherManagement = () => {
     console.log('TeacherManagement rendering');
@@ -13,6 +14,7 @@ const TeacherManagement = () => {
     const [schools, setSchools] = useState([]);
     const [currentUserRole, setCurrentUserRole] = useState(null);
     const [currentUserSchoolId, setCurrentUserSchoolId] = useState(null);
+    const [currentUserId, setCurrentUserId] = useState(null);
     const [isBulkOpen, setIsBulkOpen] = useState(false);
     const [assignmentFilter, setAssignmentFilter] = useState('all'); // all, assigned, unassigned
     const [campusFilter, setCampusFilter] = useState('all');
@@ -38,6 +40,7 @@ const TeacherManagement = () => {
                 .single();
             setCurrentUserRole(data?.role);
             setCurrentUserSchoolId(data?.school_id);
+            setCurrentUserId(user.id);
 
             // If user has a specific school and is NOT admin, pre-set the school_id
             if (data?.school_id && data?.role !== 'admin') {
@@ -194,12 +197,28 @@ const TeacherManagement = () => {
 
         const matchesCampus = campusFilter === 'all' || t.school_id === campusFilter;
 
-        const matchesRole = ['director', 'principal', 'coordinator'].includes(currentUserRole)
-            ? t.school_id === currentUserSchoolId
-            : true;
+        let matchesRole = true;
+        if (currentUserRole === 'coordinator') {
+            // Coordinator only sees their own assigned teachers
+            matchesRole = t.coordinator_id === currentUserId;
+        } else if (['director', 'principal'].includes(currentUserRole)) {
+            matchesRole = t.school_id === currentUserSchoolId;
+        }
 
         return matchesSearch && matchesAssignment && matchesCampus && matchesRole;
     });
+
+    const canManageTeacher = (teacher) => {
+        if (!currentUserRole) return false;
+        if (['admin', 'rector', 'supervisor'].includes(currentUserRole)) return true;
+        if (['director', 'principal'].includes(currentUserRole)) {
+            return teacher.school_id === currentUserSchoolId;
+        }
+        if (currentUserRole === 'coordinator') {
+            return teacher.coordinator_id === currentUserId;
+        }
+        return false;
+    };
 
     const canAssignCoordinators = ['admin', 'director', 'principal', 'rector', 'supervisor'].includes(currentUserRole);
 
@@ -289,29 +308,39 @@ const TeacherManagement = () => {
                             <tr key={teacher.id} style={{ opacity: teacher.is_active ? 1 : 0.6 }}>
                                 <td className="font-bold">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        {teacher.full_name}
+                                        {formatAppName(teacher.full_name)}
                                         {!teacher.is_active && <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#e2e8f0', color: '#64748b' }}>Inactivo</span>}
                                     </div>
                                 </td>
                                 <td>
-                                    <button
-                                        onClick={() => handleToggleActive(teacher.id, teacher.is_active)}
-                                        className="btn-icon"
-                                        title={teacher.is_active ? "Desactivar Maestro" : "Activar Maestro"}
-                                        style={{ color: teacher.is_active ? '#22c55e' : '#cbd5e1' }}
-                                    >
-                                        <Power size={18} />
-                                    </button>
+                                    {canManageTeacher(teacher) ? (
+                                        <button
+                                            onClick={() => handleToggleActive(teacher.id, teacher.is_active)}
+                                            className="btn-icon"
+                                            title={teacher.is_active ? "Desactivar Maestro" : "Activar Maestro"}
+                                            style={{ color: teacher.is_active ? '#22c55e' : '#cbd5e1' }}
+                                        >
+                                            <Power size={18} />
+                                        </button>
+                                    ) : (
+                                        <Power size={18} style={{ color: '#cbd5e1', opacity: 0.5 }} title="Sin permisos" />
+                                    )}
                                 </td>
                                 <td>{teacher.schools?.name || 'No asignado'}</td>
                                 <td>
-                                    <button
-                                        onClick={() => handleToggleStatus(teacher.id, teacher.tenure_status)}
-                                        className={`badge ${teacher.tenure_status}`}
-                                        style={{ cursor: 'pointer', border: 'none' }}
-                                    >
-                                        {teacher.tenure_status === 'new' ? 'NUEVO (Semanal)' : 'ANTIGÜEDAD (15 días)'}
-                                    </button>
+                                    {canManageTeacher(teacher) ? (
+                                        <button
+                                            onClick={() => handleToggleStatus(teacher.id, teacher.tenure_status)}
+                                            className={`badge ${teacher.tenure_status}`}
+                                            style={{ cursor: 'pointer', border: 'none' }}
+                                        >
+                                            {teacher.tenure_status === 'new' ? 'NUEVO (Semanal)' : 'ANTIGÜEDAD (15 días)'}
+                                        </button>
+                                    ) : (
+                                        <span className={`badge ${teacher.tenure_status}`}>
+                                            {teacher.tenure_status === 'new' ? 'NUEVO (Semanal)' : 'ANTIGÜEDAD (15 días)'}
+                                        </span>
+                                    )}
                                 </td>
                                 <td>
                                     {canAssignCoordinators ? (
@@ -325,13 +354,13 @@ const TeacherManagement = () => {
                                             {coordinators
                                                 .filter(c => !teacher.school_id || c.school_id === teacher.school_id)
                                                 .map(c => (
-                                                    <option key={c.id} value={c.id}>{c.full_name}</option>
+                                                    <option key={c.id} value={c.id}>{formatAppName(c.full_name)}</option>
                                                 ))
                                             }
                                         </select>
                                     ) : (
                                         <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-                                            {coordinators.find(c => c.id === teacher.coordinator_id)?.full_name || 'Sin Asignar'}
+                                            {formatAppName(coordinators.find(c => c.id === teacher.coordinator_id)?.full_name) || 'Sin Asignar'}
                                         </span>
                                     )}
 
@@ -340,14 +369,16 @@ const TeacherManagement = () => {
                                     {teacher.coordinator_id ? <UserCheck className="text-success" size={18} /> : <CircleAlert className="text-muted" size={18} />}
                                 </td>
                                 <td style={{ textAlign: 'right' }}>
-                                    <button
-                                        onClick={() => handleDeleteTeacher(teacher.id, teacher.full_name)}
-                                        className="btn-icon"
-                                        style={{ color: '#ef4444' }}
-                                        title="Eliminar Profesor"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+                                    {canManageTeacher(teacher) && (
+                                        <button
+                                            onClick={() => handleDeleteTeacher(teacher.id, teacher.full_name)}
+                                            className="btn-icon"
+                                            style={{ color: '#ef4444' }}
+                                            title="Eliminar Profesor"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CircleCheck, CircleAlert, Clock, Calendar, User } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { WeekService } from '../../services/weekService';
+import { formatAppName } from '../../utils/formatters';
 
 const CoordinatorDashboard = ({ userProfile }) => {
     const navigate = useNavigate();
@@ -88,7 +89,7 @@ const CoordinatorDashboard = ({ userProfile }) => {
             <div className="welcome-section card">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2>Hola, {userProfile?.full_name || 'Coordinador'}</h2>
+                        <h2>Hola, {formatAppName(userProfile?.full_name) || 'Coordinador'}</h2>
                         <p className="text-muted">Tienes {teachers.length} maestros asignados para seguimiento.</p>
                     </div>
                     <div className="progress-circle">
@@ -109,8 +110,8 @@ const CoordinatorDashboard = ({ userProfile }) => {
                     </div>
                 ) : (
                     teachers.map(teacher => (
-                        <div 
-                            key={teacher.id} 
+                        <div
+                            key={teacher.id}
                             className={`status-card ${teacher.status}`}
                             onClick={() => handleTeacherClick(teacher.id)}
                             title={`Click para iniciar observación de ${teacher.full_name}`}
@@ -121,7 +122,7 @@ const CoordinatorDashboard = ({ userProfile }) => {
                                         <User size={16} />
                                     </div>
                                     <div>
-                                        <h4>{teacher.full_name}</h4>
+                                        <h4>{formatAppName(teacher.full_name)}</h4>
                                         <span className={`badge ${teacher.tenure_status}`}>
                                             {teacher.tenure_status === 'new' ? 'NUEVO' : 'ANTIGÜEDAD'}
                                         </span>

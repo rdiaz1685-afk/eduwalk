@@ -18,6 +18,8 @@ export const formatAppName = (name, email = '') => {
     }
 
     if (parts.length <= 1) return name;
-    // Returns First Name + Last Token (Surname)
-    return `${parts[0]} ${parts[parts.length - 1]}`;
+
+    // Returns First word + Second word (usually First Name + First Surname)
+    // This addresses the request to see "First Name + First Surname" instead of just last name
+    return `${parts[0]} ${parts[1]}`;
 };

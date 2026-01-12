@@ -3,6 +3,7 @@ import { FileText, Download, Filter, Search, Brain, Eye } from 'lucide-react';
 import { generateObservationPDF } from '../services/pdfService';
 import { analyzeObservation } from '../services/aiAnalysisService';
 import { supabase } from '../lib/supabase';
+import { formatAppName } from '../utils/formatters';
 import AIAnalysisReport from '../components/Analysis/AIAnalysisReport';
 import ScheduleFollowUpModal from '../components/FollowUp/ScheduleFollowUpModal';
 import '../styles/Reports.css';
@@ -193,7 +194,7 @@ const Reports = () => {
                         ) : (
                             filteredReports.map((report) => (
                                 <tr key={report.id}>
-                                    <td className="fw-medium">{report.teachers?.full_name || 'Unknown'}</td>
+                                    <td className="fw-medium">{formatAppName(report.teachers?.full_name) || 'Unknown'}</td>
                                     <td>{new Date(report.created_at).toLocaleDateString()}</td>
                                     <td>{report.template_data?.metadata?.subject || 'General Observation'}</td>
                                     <td>
@@ -235,7 +236,7 @@ const Reports = () => {
                         <div className="modal-header">
                             <h2>
                                 <Brain size={24} />
-                                Análisis de IA - {selectedReport?.teachers?.full_name}
+                                Análisis de IA - {formatAppName(selectedReport?.teachers?.full_name)}
                             </h2>
                             <button
                                 onClick={handleCloseAnalysisModal}
@@ -249,7 +250,7 @@ const Reports = () => {
                                 analysisData={aiAnalysis}
                                 onAcceptPlan={handleAcceptActionPlan}
                                 onScheduleFollowUp={handleScheduleFollowUp}
-                                teacherName={selectedReport?.teachers?.full_name}
+                                teacherName={formatAppName(selectedReport?.teachers?.full_name)}
                                 date={new Date(selectedReport?.created_at).toLocaleDateString()}
                             />
                         </div>
@@ -266,7 +267,7 @@ const Reports = () => {
                         setSelectedActionPlan(null);
                     }}
                     teacherId={selectedReport?.teacher_id}
-                    teacherName={selectedReport?.teachers?.full_name}
+                    teacherName={formatAppName(selectedReport?.teachers?.full_name)}
                     coordinatorId={selectedReport?.observer_id}
                     actionPlan={selectedActionPlan}
                     onScheduleComplete={handleFollowUpScheduleComplete}
