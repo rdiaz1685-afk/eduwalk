@@ -253,7 +253,7 @@ const TeacherManagement = () => {
         return false;
     };
 
-    const canAssignCoordinators = ['admin', 'director', 'principal', 'rector', 'supervisor'].includes(currentUserRole);
+    const canAssignCoordinators = ['admin', 'director', 'principal'].includes(currentUserRole);
 
     if (loading) return <div className="p-8 text-center text-muted">Cargando datos de maestros...</div>;
 
