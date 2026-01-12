@@ -394,27 +394,7 @@ const WeeklyComplianceDashboard = () => {
         updateRemainingDays();
     };
 
-    const handleFixPermissions = async () => {
-        try {
-            const sql = `
-                DROP POLICY IF EXISTS "Enable read access for all users" ON observations;
-                CREATE POLICY "Enable read access for all users" ON observations FOR SELECT USING (true);
-                
-                DROP POLICY IF EXISTS "Enable read access for all users" ON teachers;
-                CREATE POLICY "Enable read access for all users" ON teachers FOR SELECT USING (true);
-            `;
-            const { error } = await supabase.rpc('execute_sql', { sql_query: sql });
-            if (error) {
-                console.error('Error fixing permissions:', error);
-                alert('Error al reparar permisos: ' + error.message);
-            } else {
-                alert('Permisos reparados exitosamente. Ahora intenta Actualizar.');
-                handleRefresh();
-            }
-        } catch (err) {
-            alert('Error inesperado: ' + err.message);
-        }
-    };
+
 
     const currentDateRange = viewType === 'weekly'
         ? WeekService.getWeekDateRange(currentWeek)
@@ -471,9 +451,6 @@ const WeeklyComplianceDashboard = () => {
                         <button onClick={handleRefresh} className="btn btn-outline">
                             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                             Actualizar
-                        </button>
-                        <button onClick={handleFixPermissions} className="btn btn-primary" style={{ backgroundColor: '#f59e0b', borderColor: '#f59e0b' }}>
-                            Reparar Permisos
                         </button>
                     </div>
                 </div>
