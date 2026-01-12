@@ -17,6 +17,14 @@ const TeacherManagement = () => {
     const [currentUserId, setCurrentUserId] = useState(null);
     const [isBulkOpen, setIsBulkOpen] = useState(false);
     const [selectedTeacherId, setSelectedTeacherId] = useState(null);
+    const [assignmentFilter, setAssignmentFilter] = useState('all');
+    const [campusFilter, setCampusFilter] = useState('all');
+    const [newTeacher, setNewTeacher] = useState({
+        full_name: '',
+        email: '',
+        tenure_status: 'new',
+        school_id: ''
+    });
 
     useEffect(() => {
         fetchData();
