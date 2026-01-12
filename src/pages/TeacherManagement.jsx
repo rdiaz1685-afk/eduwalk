@@ -305,7 +305,7 @@ const TeacherManagement = () => {
                     </thead>
                     <tbody>
                         {filteredTeachers.map(teacher => (
-                            <tr key={teacher.id} style={{ opacity: teacher.is_active ? 1 : 0.6 }}>
+                            <tr key={`${teacher.id}-${Date.now()}`} style={{ opacity: teacher.is_active ? 1 : 0.6 }}>
                                 <td className="font-bold">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         {teacher.full_name}
