@@ -98,7 +98,83 @@ const TeacherManagement = () => {
         setNewTeacher({ full_name: '', email: '', tenure_status: 'new', school_id: '' });
     };
 
-    // ... (handleToggleActive and related functions)
+    const handleToggleActive = async (teacherId, currentStatus) => {
+        try {
+            const { error } = await supabase
+                .from('teachers')
+                .update({ is_active: !currentStatus })
+                .eq('id', teacherId);
+
+            if (error) throw error;
+            fetchData();
+        } catch (err) {
+            alert('Error al cambiar estado activo: ' + err.message);
+        }
+    };
+
+    const handleDeleteTeacher = async (teacherId, teacherName) => {
+        if (!window.confirm(`¿Estás seguro de eliminar a ${teacherName}?`)) return;
+
+        try {
+            // Attempt delete directly
+            const { error: deleteError } = await supabase
+                .from('teachers')
+                .delete()
+                .eq('id', teacherId);
+
+            if (deleteError) {
+                // Check if it's a foreign key violation (Postgres code 23503)
+                if (deleteError.code === '23503' || deleteError.message?.includes('foreign key constraint')) {
+                    alert(`El maestro ${teacherName} ya cuenta con historial de observaciones (evaluaciones), por lo que no es posible eliminarlo definitivamente de la base de datos.\n\nEn su lugar, ha sido DESACTIVADO. Esto significa que ya no aparecerá en las listas de asignación, pero sus datos históricos se conservan.`);
+
+                    // Automatically deactivate
+                    await supabase.from('teachers').update({ is_active: false }).eq('id', teacherId);
+                    fetchData();
+                    return;
+                }
+                throw deleteError;
+            }
+
+            alert('Profesor eliminado correctamente');
+            fetchData();
+        } catch (err) {
+            alert('Error al eliminar: ' + err.message);
+        }
+    };
+
+    const filteredTeachers = (teachers || []).filter(t => {
+        const matchesSearch = (t.full_name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
+
+        let matchesAssignment = true;
+        if (assignmentFilter === 'assigned') matchesAssignment = !!t.coordinator_id;
+        if (assignmentFilter === 'unassigned') matchesAssignment = !t.coordinator_id;
+
+        const matchesCampus = campusFilter === 'all' || t.school_id === campusFilter;
+
+        let matchesRole = true;
+        if (currentUserRole === 'coordinator') {
+            // Coordinator only sees their own assigned teachers
+            matchesRole = t.coordinator_id === currentUserId;
+        } else if (['director', 'principal'].includes(currentUserRole)) {
+            matchesRole = t.school_id === currentUserSchoolId;
+        }
+
+        return matchesSearch && matchesAssignment && matchesCampus && matchesRole;
+    });
+
+    const canManageTeacher = (teacher) => {
+        if (!currentUserRole) return false;
+        if (['admin', 'rector', 'supervisor'].includes(currentUserRole)) return true;
+        if (['director', 'principal'].includes(currentUserRole)) {
+            return teacher.school_id === currentUserSchoolId;
+        }
+        if (currentUserRole === 'coordinator') {
+            return teacher.coordinator_id === currentUserId;
+        }
+        return false;
+    };
+
+    const canAssignCoordinators = ['admin', 'director', 'principal', 'rector', 'supervisor'].includes(currentUserRole);
 
     if (loading) return <div className="p-8 text-center text-muted">Cargando datos de maestros...</div>;
 
