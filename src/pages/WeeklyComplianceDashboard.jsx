@@ -110,10 +110,10 @@ const WeeklyComplianceDashboard = () => {
 
             // 3. Fetch all observations for these teachers within the max range
             // We use the start of the fortnight range to be safe (it covers week range too usually)
-            // Relax the filter by 7 days to avoid potential timezone truncation issues at the start boundary
+            // Relax the filter by 30 days to avoid potential timezone truncation issues at the start boundary
             const baseDate = fortnightlyRange.start < weeklyRange.start ? fortnightlyRange.start : weeklyRange.start;
             const safeEarliestDate = new Date(baseDate);
-            safeEarliestDate.setDate(safeEarliestDate.getDate() - 7);
+            safeEarliestDate.setDate(safeEarliestDate.getDate() - 30);
 
             let obsQuery = supabase
                 .from('observations')
@@ -157,7 +157,15 @@ const WeeklyComplianceDashboard = () => {
 
                 return observations.some(obs => {
                     const obsDate = new Date(obs.created_at);
-                    return obsDate >= targetRange.start && obsDate <= targetRange.end;
+
+                    // Normalize range to cover full days
+                    const start = new Date(targetRange.start);
+                    start.setHours(0, 0, 0, 0);
+
+                    const end = new Date(targetRange.end);
+                    end.setHours(23, 59, 59, 999);
+
+                    return obsDate >= start && obsDate <= end;
                 });
             });
 
@@ -173,7 +181,15 @@ const WeeklyComplianceDashboard = () => {
 
                 const hasObservationInRange = observations.some(obs => {
                     const obsDate = new Date(obs.created_at);
-                    return obsDate >= targetRange.start && obsDate <= targetRange.end;
+
+                    // Normalize range to cover full days
+                    const start = new Date(targetRange.start);
+                    start.setHours(0, 0, 0, 0);
+
+                    const end = new Date(targetRange.end);
+                    end.setHours(23, 59, 59, 999);
+
+                    return obsDate >= start && obsDate <= end;
                 });
                 return !hasObservationInRange;
             });
