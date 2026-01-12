@@ -109,11 +109,9 @@ const WeeklyComplianceDashboard = () => {
             const teacherIds = (teachersData || []).map(t => t.id);
 
             // 3. Fetch all observations for these teachers within the max range
-            // We use the start of the fortnight range to be safe (it covers week range too usually)
-            // Relax the filter by 30 days to avoid potential timezone truncation issues at the start boundary
-            const baseDate = fortnightlyRange.start < weeklyRange.start ? fortnightlyRange.start : weeklyRange.start;
-            const safeEarliestDate = new Date(baseDate);
-            safeEarliestDate.setDate(safeEarliestDate.getDate() - 30);
+            // Drastically widen filter to 90 days to ensure we definitely get the data
+            const safeEarliestDate = new Date();
+            safeEarliestDate.setDate(safeEarliestDate.getDate() - 90);
 
             let obsQuery = supabase
                 .from('observations')
