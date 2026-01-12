@@ -368,13 +368,13 @@ const TeacherManagement = () => {
                                             {coordinators
                                                 .filter(c => !teacher.school_id || c.school_id === teacher.school_id)
                                                 .map(c => (
-                                                    <option key={c.id} value={c.id}>{formatAppName(c.full_name)}</option>
+                                                    <option key={c.id} value={c.id}>{c.full_name}</option>
                                                 ))
                                             }
                                         </select>
                                     ) : (
                                         <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-                                            {formatAppName(coordinators.find(c => c.id === teacher.coordinator_id)?.full_name) || 'Sin Asignar'}
+                                            {coordinators.find(c => c.id === teacher.coordinator_id)?.full_name || 'Sin Asignar'}
                                         </span>
                                     )}
                                 </td>
