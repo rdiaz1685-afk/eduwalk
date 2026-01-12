@@ -146,8 +146,28 @@
 }
 
 .status-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 0 20px var(--primary-glow);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px -10px rgba(0, 0, 0, 0.5);
+}
+
+.status-card.pending {
+    border-left: 4px solid var(--error);
+    cursor: pointer;
+}
+
+.status-card.pending:hover {
+    border-color: var(--error);
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
+}
+
+.status-card.completed {
+    border-left: 4px solid var(--success);
+    cursor: pointer;
+}
+
+.status-card.completed:hover {
+    border-color: var(--success);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
 }
 
 .progress-bar-bg {
@@ -159,7 +179,25 @@
 
 .progress-bar-fill {
     border-radius: 999px;
-    box-shadow: 0 0 10px currentColor;
+    height: 100%;
+}
+
+.progress-bar-fill.completed {
+    background-color: var(--success);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.progress-bar-fill.pending {
+    background-color: var(--error);
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+}
+
+.status-icon.completed {
+    color: var(--success);
+}
+
+.status-icon.pending {
+    color: var(--error);
 }
 
 .badge {

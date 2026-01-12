@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CircleCheck, CircleAlert, Clock, Calendar, User } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { WeekService } from '../../services/weekService';
 
 const CoordinatorDashboard = ({ userProfile }) => {
+    const navigate = useNavigate();
     const [teachers, setTeachers] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -75,6 +77,10 @@ const CoordinatorDashboard = ({ userProfile }) => {
         }
     };
 
+    const handleTeacherClick = (teacherId) => {
+        navigate('/observations', { state: { teacherId } });
+    };
+
     const completedCount = teachers.filter(t => t.evaluatedThisPeriod).length;
 
     return (
@@ -103,7 +109,12 @@ const CoordinatorDashboard = ({ userProfile }) => {
                     </div>
                 ) : (
                     teachers.map(teacher => (
-                        <div key={teacher.id} className={`status-card ${teacher.status}`}>
+                        <div 
+                            key={teacher.id} 
+                            className={`status-card ${teacher.status}`}
+                            onClick={() => handleTeacherClick(teacher.id)}
+                            title={`Click para iniciar observación de ${teacher.full_name}`}
+                        >
                             <div className="flex justify-between items-start mb-4">
                                 <div className="user-info">
                                     <div className="avatar-small">
@@ -139,7 +150,7 @@ const CoordinatorDashboard = ({ userProfile }) => {
                             <div className="progress-bar-bg mt-4">
                                 <div
                                     className={`progress-bar-fill ${teacher.status}`}
-                                    style={{ width: teacher.status === 'completed' ? '100%' : '0%' }}
+                                    style={{ width: teacher.status === 'completed' ? '100%' : '100%' }}
                                 ></div>
                             </div>
                         </div>

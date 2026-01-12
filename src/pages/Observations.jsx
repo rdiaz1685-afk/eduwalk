@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     ChevronRight,
     ArrowLeft,
@@ -13,6 +14,7 @@ import { supabase } from '../lib/supabase';
 import '../styles/Observations.css';
 
 const Observations = () => {
+    const location = useLocation();
     const [activeTemplate, setActiveTemplate] = useState(null);
     const [observationData, setObservationData] = useState({});
 
@@ -29,12 +31,17 @@ const Observations = () => {
     const [error, setError] = useState(null);
     const [isAddingTeacher, setIsAddingTeacher] = useState(false);
     const [newTeacherName, setNewTeacherName] = useState('');
-    const [selectedTeacherId, setSelectedTeacherId] = useState('');
+    const [selectedTeacherId, setSelectedTeacherId] = useState(location.state?.teacherId || '');
     const [subject, setSubject] = useState('');
 
     useEffect(() => {
         fetchTeachers();
-    }, []);
+
+        // If teacherId is passed in state, we might want to automatically scroll or focus
+        if (location.state?.teacherId) {
+            setSelectedTeacherId(location.state.teacherId);
+        }
+    }, [location.state]);
 
     const fetchTeachers = async () => {
         try {
