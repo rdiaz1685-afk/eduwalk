@@ -110,14 +110,16 @@ const WeeklyComplianceDashboard = () => {
 
             // 3. Fetch all observations for these teachers within the max range
             // We use the start of the fortnight range to be safe (it covers week range too usually)
-            // Actually, let's just get observations from the earliest date we care about.
-            const earliestDate = fortnightlyRange.start < weeklyRange.start ? fortnightlyRange.start : weeklyRange.start;
+            // Relax the filter by 7 days to avoid potential timezone truncation issues at the start boundary
+            const baseDate = fortnightlyRange.start < weeklyRange.start ? fortnightlyRange.start : weeklyRange.start;
+            const safeEarliestDate = new Date(baseDate);
+            safeEarliestDate.setDate(safeEarliestDate.getDate() - 7);
 
             let obsQuery = supabase
                 .from('observations')
                 .select('id, created_at, teacher_id')
                 .in('teacher_id', teacherIds)
-                .gte('created_at', earliestDate.toISOString());
+                .gte('created_at', safeEarliestDate.toISOString());
 
             const { data: obsData, error: obsError } = await obsQuery;
             if (obsError) throw obsError;
