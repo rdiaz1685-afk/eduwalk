@@ -308,7 +308,7 @@ const TeacherManagement = () => {
                             <tr key={teacher.id} style={{ opacity: teacher.is_active ? 1 : 0.6 }}>
                                 <td className="font-bold">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        {formatAppName(teacher.full_name)}
+                                        {teacher.full_name}
                                         {!teacher.is_active && <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#e2e8f0', color: '#64748b' }}>Inactivo</span>}
                                     </div>
                                 </td>
