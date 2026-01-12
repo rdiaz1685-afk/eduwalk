@@ -74,6 +74,10 @@ const WeeklyComplianceDashboard = () => {
                 ? WeekService.getWeekDateRange(currentWeek)
                 : WeekService.getFortnightDateRange(currentFortnight);
 
+            // Get BOTH ranges for smart compliance calculation
+            const weeklyRange = WeekService.getWeekDateRange(currentWeek);
+            const fortnightlyRange = WeekService.getFortnightDateRange(currentFortnight);
+
             // Filter for Director: only coordinators of their same school
             let coordQuery = supabase
                 .from('profiles')
@@ -85,6 +89,7 @@ const WeeklyComplianceDashboard = () => {
                         id,
                         full_name,
                         school_id,
+                        tenure_status,
                         observations(
                             id,
                             created_at,
@@ -106,7 +111,8 @@ const WeeklyComplianceDashboard = () => {
 
             // Important: If director, we must also ensure we only count teachers of THAT school 
             // (though coordinators are usually tied to one school anyway)
-            const processedData = processComplianceData(rawData, dateRange, profile);
+            // We pass both ranges to use smart logic
+            const processedData = processComplianceData(rawData, dateRange, profile, weeklyRange, fortnightlyRange);
             setComplianceData(processedData);
             setCoordinatorData(processedData.coordinators);
         } catch (error) {
@@ -118,7 +124,7 @@ const WeeklyComplianceDashboard = () => {
         }
     };
 
-    const processComplianceData = (rawData, dateRange, viewerProfile) => {
+    const processComplianceData = (rawData, defaultDateRange, viewerProfile, weeklyRange, fortnightlyRange) => {
         const coordinators = rawData.map(coordinator => {
             let teachers = coordinator.teachers || [];
             if (viewerProfile?.role === 'director' && viewerProfile.school_id) {
@@ -128,17 +134,33 @@ const WeeklyComplianceDashboard = () => {
 
             const teachersWithObservations = teachers.filter(teacher => {
                 const observations = teacher.observations || [];
+
+                // Smart Logic: Determine applicable range based on tenure status
+                const isNew = teacher.tenure_status === 'new';
+                // If ranges are provided (smart mode), use them. Otherwise fallback to defaultDateRange
+                const targetRange = (weeklyRange && fortnightlyRange)
+                    ? (isNew ? weeklyRange : fortnightlyRange)
+                    : defaultDateRange;
+
                 return observations.some(obs => {
                     const obsDate = new Date(obs.created_at);
-                    return obsDate >= dateRange.start && obsDate <= dateRange.end;
+                    return obsDate >= targetRange.start && obsDate <= targetRange.end;
                 });
             });
 
             const pendingTeachers = teachers.filter(teacher => {
                 const observations = teacher.observations || [];
+
+                // Smart Logic: Determine applicable range based on tenure status
+                const isNew = teacher.tenure_status === 'new';
+                // If ranges are provided (smart mode), use them. Otherwise fallback to defaultDateRange
+                const targetRange = (weeklyRange && fortnightlyRange)
+                    ? (isNew ? weeklyRange : fortnightlyRange)
+                    : defaultDateRange;
+
                 const hasObservationInRange = observations.some(obs => {
                     const obsDate = new Date(obs.created_at);
-                    return obsDate >= dateRange.start && obsDate <= dateRange.end;
+                    return obsDate >= targetRange.start && obsDate <= targetRange.end;
                 });
                 return !hasObservationInRange;
             });
